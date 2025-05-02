@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini API RPM Tester</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #1a73e8;
+      margin-top: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      margin: 10px 0;
+    }
+    
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+    
+    button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #0d62cb;
+    }
+    
+    button:disabled {
+      background-color: #9aa0a6;
+      cursor: not-allowed;
+    }
+    
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #f1f8ff;
+      border-left: 4px solid #1a73e8;
+    }
+    
+    .results h2 {
+      margin-top: 0;
+      color: #1a73e8;
+    }
+    
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .stat:last-child {
+      border-bottom: none;
+    }
+    
+    .stat-label {
+      font-weight: bold;
+    }
+    
+    .error-message {
+      color: #d93025;
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #fce8e6;
+      border-radius: 4px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gemini API RPM Tester</h1>
+    <p>Test how many requests per minute (RPM) you can make to the Gemini API before hitting rate limits</p>
+    
+    <div class="form-group">
+      <label for="apiKey">API Key:</label>
+      <input type="text" id="apiKey" placeholder="Enter your Gemini API key" autocomplete="off">
+    </div>
+    
+    <div class="form-group">
+      <label for="requestsPerSecond">Requests Per Second: <span id="rpsDisplay">5</span></label>
+      <input type="range" id="requestsPerSecond" min="1" max="20" value="5">
+      <div class="range-labels">
+        <span>Slower (1/sec)</span>
+        <span>Faster (20/sec)</span>
+      </div>
+      <p><small>Higher values will test the rate limit faster but may be less accurate</small></p>
+    </div>
+    
+    <button id="startButton">Start RPM Test</button>
+    
+    <div class="results" id="results">
+      <h2>Test Results</h2>
+      <p>Click "Start RPM Test" to begin testing the Gemini API rate limits</p>
+    </div>
+    
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+  
+  <script src="gemini-rpm-tester.js"></script>
+</body>
+</html>

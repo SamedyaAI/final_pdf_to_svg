@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Fixer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      margin-bottom: 20px;
+      padding: 10px;
+    }
+    button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #3367d6;
+    }
+    .preview {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-top: 20px;
+      overflow: auto;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #f0f0f0;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+    .tab.active {
+      background: #4285f4;
+      color: white;
+      border-color: #4285f4;
+    }
+    #errorMsg {
+      color: red;
+      margin-top: 10px;
+    }
+    #svgContainer {
+      max-width: 100%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>SVG Fixer</h1>
+  <p>Paste your broken SVG below and choose a method to fix it.</p>
+  
+  <div class="tabs">
+    <div class="tab active" data-method="ai">Fix with AI</div>
+    <div class="tab" data-method="regex">Fix with Regex</div>
+  </div>
+  
+  <textarea id="svgInput" placeholder="Paste your SVG here..."></textarea>
+  
+  <button id="fixButton">Fix SVG</button>
+  <button id="clearButton">Clear</button>
+  <button id="downloadButton" disabled>Download Fixed SVG</button>
+  <div id="errorMsg"></div>
+  
+  <h2>Preview</h2>
+  <div class="preview">
+    <div id="svgContainer"></div>
+  </div>
+  
+  <script>
+    let currentMethod = 'ai';
+    let fixedSvg = null;
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentMethod = tab.dataset.method;
+      });
+    });
+    
+    document.getElementById('fixButton').addEventListener('click', async () => {
+      const svgInput = document.getElementById('svgInput').value;
+      const errorMsg = document.getElementById('errorMsg');
+      const svgContainer = document.getElementById('svgContainer');
+      const downloadButton = document.getElementById('downloadButton');
+      
+      if (!svgInput) {
+        errorMsg.textContent = 'Please enter SVG content';
+        return;
+      }
+      
+      try {
+        errorMsg.textContent = 'Processing...';
+        svgContainer.innerHTML = '';
+        downloadButton.disabled = true;
+        
+        const response = await fetch(`/api/fix-svg?method=${currentMethod}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: svgInput
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          fixedSvg = result.svg;
+          errorMsg.textContent = result.message || 'SVG fixed successfully';
+          svgContainer.innerHTML = fixedSvg;
+          downloadButton.disabled = false;
+        } else {
+          errorMsg.textContent = result.error || 'Failed to fix SVG';
+          svgContainer.innerHTML = '';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Error: ' + error.message;
+        svgContainer.innerHTML = '';
+      }
+    });
+    
+    document.getElementById('clearButton').addEventListener('click', () => {
+      document.getElementById('svgInput').value = '';
+      document.getElementById('svgContainer').innerHTML = '';
+      document.getElementById('errorMsg').textContent = '';
+      document.getElementById('downloadButton').disabled = true;
+      fixedSvg = null;
+    });
+    
+    document.getElementById('downloadButton').addEventListener('click', () => {
+      if (!fixedSvg) return;
+      
+      const blob = new Blob([fixedSvg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'fixed-svg.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
