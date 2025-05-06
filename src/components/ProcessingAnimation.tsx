@@ -10,7 +10,7 @@ export function ProcessingAnimation({ onComplete, startTime }: ProcessingAnimati
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [showExtendedMessage, setShowExtendedMessage] = useState(false);
   
-  const EXPECTED_TIME = 300; // 5 minutes in seconds
+  const EXPECTED_TIME = 120; // 5 minutes in seconds
   const UPDATE_INTERVAL = 1000; // Update every second instead of 100ms
 
   useEffect(() => {
